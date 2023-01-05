@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { GiphySearchType, fetchType, ImageData } from "../../types/apiTypes";
 
+const { REACT_APP_GIPHY_API_KEY } = process.env;
+
 const IMAGES_PER_ROW = 5;
 
 type dataState = {
@@ -21,7 +23,7 @@ export const fetchGIFByPage = createAsyncThunk<GiphySearchType, fetchType>(
   "search",
   async ({ search, page }) => {
     const response = await fetch(
-      `https://api.giphy.com/v1/gifs/search?api_key=${process.env.REACT_APP_GIPHY_API_KEY}&q=${search}&limit=10&offset=${page}`,
+      `https://api.giphy.com/v1/gifs/search?api_key=${REACT_APP_GIPHY_API_KEY}&q=${search}&limit=10&offset=${page}`,
       { headers: { Accept: "application/json" } }
     );
     const data = await response.json();
