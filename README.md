@@ -1,9 +1,9 @@
 # Assesment Web-Dev
 ## Tech: 
-- ReactJS
-- Redux (Redux Toolkit)
-- Vercel (free Heroku alternative)
-- React Bootsrap
+- [ReactJS](https://reactjs.org/)
+- Redux ([Redux Toolkit](https://redux-toolkit.js.org/))
+- [Vercel](https://vercel.com/) (free Heroku alternative)
+- [React Bootstrap](https://react-bootstrap.netlify.app/)
 
 ## About
 
