@@ -5,6 +5,7 @@ export const store = configureStore({
   reducer: {
     data: data.reducer,
   },
+  devTools: true,
 });
 
 export type AppDispatch = typeof store.dispatch;

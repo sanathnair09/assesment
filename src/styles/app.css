@@ -1,0 +1,21 @@
+#app-container {
+  flex: 1;
+  flex-direction: column;
+  background-color: #121212;
+  display: flex;
+  height: 110vh;
+}
+
+#search-container {
+  display: flex;
+  margin-left: 10vh;
+  margin-right: 10vh;
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+}
+
+#table-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #121212;
+}

@@ -3,7 +3,10 @@ import { Col, Container, Row, Image } from "react-bootstrap";
 import SearchBar from "./components/SearchBar";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { fetchGIFByPage } from "./redux/reducers/data";
+import { ImageData } from "./types/apiTypes";
+import "./styles/app.css";
 
+const PAGINATION_OFFSET = 10;
 const IMAGE_SIZE = 320 / 1.2;
 
 const App = () => {
@@ -17,87 +20,67 @@ const App = () => {
   const lastElementRef = useCallback(
     (ref: any) => {
       const eventHandler = () => {
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver((entries) => {
-          if (entries[0].isIntersecting && currentPage < maxPages) {
-            dispatch(
-              fetchGIFByPage({ search: keyword, page: currentPage + 1 })
-            );
-          }
-        });
-        if (ref) observer.current.observe(ref);
-        window.removeEventListener("scroll", eventHandler);
+        let limiter = 0;
+        if (limiter === 0) {
+          if (observer.current) observer.current.disconnect();
+          observer.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && currentPage < maxPages) {
+              dispatch(
+                fetchGIFByPage({
+                  search: keyword,
+                  page: currentPage + PAGINATION_OFFSET,
+                })
+              );
+            }
+          });
+          if (ref) observer.current.observe(ref);
+          limiter++;
+          window.removeEventListener("scroll", eventHandler);
+        }
       };
       window.addEventListener("scroll", eventHandler);
     },
-    [currentPage, keyword, maxPages]
+    [currentPage, keyword, maxPages, dispatch]
   );
 
+  const generateRow = (row: number, data: ImageData[]) => {
+    return data.map((url, index) => (
+      <Col key={index + url.id}>
+        {row === urls.length - 1 && index === data.length - 1 ? (
+          <Image
+            key={url.id}
+            src={url.url}
+            className="m-1"
+            rounded
+            width={IMAGE_SIZE}
+            height={IMAGE_SIZE}
+            ref={lastElementRef}
+          />
+        ) : (
+          <Image
+            key={url.id}
+            src={url.url}
+            className="m-1"
+            rounded
+            width={IMAGE_SIZE}
+            height={IMAGE_SIZE}
+          />
+        )}
+      </Col>
+    ));
+  };
+
   return (
-    <div
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        backgroundColor: "#121212",
-        display: "flex",
-        height: "110vh",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          marginLeft: "10vh",
-          marginRight: "10vh",
-          marginTop: "5vh",
-          marginBottom: "5vh",
-        }}
-      >
+    <div id="app-container">
+      <div id="search-container">
         <SearchBar />
       </div>
       {urls.length >= 2 ? (
-        <div style={{ flex: 1 }}>
-          <Container
-            fluid
-            style={{
-              // flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              backgroundColor: "#121212",
-            }}
-          >
-            {urls.map((urlGroup, row) => {
-              return (
-                <Row>
-                  {urlGroup.map((url, col) => {
-                    return (
-                      <Col>
-                        {row === urls.length - 1 &&
-                        col === urlGroup.length - 1 ? (
-                          <Image
-                            src={url.url}
-                            className="m-1"
-                            rounded
-                            width={IMAGE_SIZE}
-                            height={IMAGE_SIZE}
-                            ref={lastElementRef}
-                          />
-                        ) : (
-                          <Image
-                            src={url.url}
-                            className="m-1"
-                            rounded
-                            width={IMAGE_SIZE}
-                            height={IMAGE_SIZE}
-                          />
-                        )}
-                      </Col>
-                    );
-                  })}
-                </Row>
-              );
-            })}
-          </Container>
-        </div>
+        <Container fluid id="table-container">
+          {urls.map((group, row) => (
+            <Row>{generateRow(row, group)}</Row>
+          ))}
+        </Container>
       ) : null}
     </div>
   );

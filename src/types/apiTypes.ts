@@ -2,10 +2,12 @@ export type ImageData = {
   url: string;
   width: number;
   height: number;
+  id: string;
 };
 
 type GiphyDataType = {
   images: { original: ImageData };
+  id: string;
 };
 
 export type GiphySearchType = {

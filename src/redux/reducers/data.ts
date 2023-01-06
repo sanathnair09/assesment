@@ -3,8 +3,6 @@ import { GiphySearchType, fetchType, ImageData } from "../../types/apiTypes";
 
 const { REACT_APP_GIPHY_API_KEY } = process.env;
 
-const IMAGES_PER_ROW = 5;
-
 type dataState = {
   keyword: string;
   urls: ImageData[][];
@@ -36,6 +34,7 @@ export const data = createSlice({
   initialState,
   reducers: {
     reset: (state) => {
+      console.log("resetting");
       state.urls = [];
       state.currentPage = 0;
       state.maxPages = 0;
@@ -46,22 +45,28 @@ export const data = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchGIFByPage.fulfilled, (state, action) => {
-      console.log(action.payload);
+      state.maxPages = action.payload.pagination.total_count;
+      state.currentPage = action.payload.pagination.offset;
+
       const urls: ImageData[] = [];
       action.payload.data.forEach((gif) => {
         urls.push({
+          id: gif.id,
           url: gif.images.original.url,
           width: gif.images.original.width,
           height: gif.images.original.height,
         });
       });
-      state.urls.push(urls.slice(0, IMAGES_PER_ROW));
-      state.urls.push(urls.slice(IMAGES_PER_ROW, urls.length));
-      state.maxPages = action.payload.pagination.total_count;
-      state.currentPage = action.payload.pagination.offset;
+
+      const IMAGES_PER_ROW = 5;
+      const chunk1 = urls.slice(0, IMAGES_PER_ROW);
+      const chunk2 = urls.slice(IMAGES_PER_ROW, urls.length);
+
+      state.urls.push(chunk1);
+      state.urls.push(chunk2);
     });
     builder.addCase(fetchGIFByPage.rejected, (state, action) => {
-      console.log("error something died");
+      console.error("error something died");
     });
   },
 });
